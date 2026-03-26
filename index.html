@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <title>SRA STAGE CALC</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'background': '#0e0e0e',
+                        'primary': '#ff9062',
+                        'secondary': '#bef500',
+                        'surface-container': '#1a1a1a',
+                        'surface-container-high': '#20201f',
+                        'surface-container-highest': '#262626',
+                        'on-surface': '#ffffff',
+                        'on-surface-variant': '#adaaaa',
+                        'outline-variant': '#484847',
+                    },
+                    fontFamily: {
+                        'headline': ['Space Grotesk', 'sans-serif'],
+                        'body': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        .primary-gradient { background: linear-gradient(45deg, #ff9062 0%, #ff793e 100%); }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+</head>
+
+<body class="bg-background text-on-surface font-body min-h-screen pb-32">
+
+<header class="flex flex-col w-full bg-[#0e0e0e] z-50 sticky top-0 border-b border-outline-variant/10">
+    <div class="flex justify-start items-center px-6 h-16 w-full">
+        <h1 class="font-headline uppercase tracking-tighter font-bold text-xl text-primary">SRA STAGE CALC</h1>
+    </div>
+    <div class="px-6 pb-3" id="stageNameContainer">
+        <input class="w-full bg-surface-container border-none rounded-none text-[10px] font-black uppercase tracking-[0.2em] text-on-surface placeholder:text-on-surface-variant/40 focus:ring-1 focus:ring-secondary/50 h-10 px-4" id="stageName" placeholder="STAGE NAME (E.G. STAGE 1)" type="text"/>
+    </div>
+</header>
+
+<main class="px-4 py-6 max-w-2xl mx-auto space-y-6">
+    <div class="space-y-6" id="calculatorView">
+        <section class="relative overflow-hidden bg-surface-container-highest p-8 border-l-4 border-secondary shadow-2xl">
+            <div class="absolute top-0 right-0 p-2 opacity-10">
+                <span class="material-symbols-outlined text-[120px]">target</span>
+            </div>
+            <div class="relative z-10 flex flex-col items-center">
+                <p class="font-headline font-bold text-on-surface-variant text-[10px] uppercase tracking-[0.2em] mb-2">Hit Factor</p>
+                <div class="font-headline font-black text-secondary text-7xl md:text-8xl leading-none tabular-nums" id="hitFactorDisplay">0.00</div>
+                <div class="mt-6 flex gap-4 w-full">
+                    <div class="flex-1 bg-surface-container p-3 flex flex-col items-center border border-outline-variant/20">
+                        <span class="text-[10px] text-on-surface-variant uppercase font-bold">Points</span>
+                        <span class="text-2xl font-headline font-bold" id="pointsDisplay">0</span>
+                    </div>
+                    <div class="flex-1 bg-surface-container p-3 flex flex-col items-center border border-outline-variant/20">
+                        <span class="text-[10px] text-on-surface-variant uppercase font-bold">Time</span>
+                        <span class="text-2xl font-headline font-bold" id="timeDisplay">0.00s</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-2 gap-3" id="scoringGrid">
+            
+            <div class="bg-surface-container p-4 flex flex-col items-center justify-center">
+                <div class="flex items-center gap-1 mb-2">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Time (s)</span>
+                    <span class="material-symbols-outlined text-[12px] text-on-surface-variant">timer</span>
+                </div>
+                <div class="flex items-center h-10 w-full">
+                    <input class="w-full bg-transparent text-center font-headline font-bold text-3xl border-none p-0 focus:ring-0 tabular-nums text-on-surface" id="time" oninput="calculateHF()" step="0.01" type="number" value="0.00"/>
+                </div>
+            </div>
+
+            <div class="bg-surface-container p-4 flex flex-col items-center">
+                <span class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">A-Hits (5)</span>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('aHits', -1)">-</button>
+                    <input class="w-12 bg-transparent text-center font-headline font-bold text-2xl border-none focus:ring-0" id="aHits" oninput="calculateHF()" type="number" value="0"/>
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('aHits', 1)">+</button>
+                </div>
+            </div>
+
+            <div class="bg-surface-container p-4 flex flex-col items-center">
+                <span class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">C-Hits (3)</span>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('cHits', -1)">-</button>
+                    <input class="w-12 bg-transparent text-center font-headline font-bold text-2xl border-none focus:ring-0" id="cHits" oninput="calculateHF()" type="number" value="0"/>
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('cHits', 1)">+</button>
+                </div>
+            </div>
+
+            <div class="bg-surface-container p-4 flex flex-col items-center">
+                <span class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">D-Hits (1)</span>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('dHits', -1)">-</button>
+                    <input class="w-12 bg-transparent text-center font-headline font-bold text-2xl border-none focus:ring-0" id="dHits" oninput="calculateHF()" type="number" value="0"/>
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('dHits', 1)">+</button>
+                </div>
+            </div>
+
+            <div class="bg-surface-container p-4 flex flex-col items-center">
+                <span class="text-[10px] font-black uppercase tracking-widest text-primary mb-2">Misses (-10)</span>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('mHits', -1)">-</button>
+                    <input class="w-12 bg-transparent text-center font-headline font-bold text-2xl border-none focus:ring-0" id="mHits" oninput="calculateHF()" type="number" value="0"/>
+                    <button class="w-10 h-10 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('mHits', 1)">+</button>
+                </div>
+            </div>
+
+            <div class="bg-surface-container p-4 flex flex-col items-center">
+                <span class="text-[10px] font-black uppercase tracking-widest text-primary mb-2">No-Shoots (-10)</span>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('nsHits', -1)">-</button>
+                    <input class="w-12 bg-transparent text-center font-headline font-bold text-2xl border-none focus:ring-0" id="nsHits" oninput="calculateHF()" type="number" value="0"/>
+                    <button class="w-10 h-10 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('nsHits', 1)">+</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="space-y-3 pt-4">
+            <button class="w-full primary-gradient py-6 font-headline font-black text-black uppercase tracking-[0.2em] active:scale-[0.98] transition-transform shadow-lg shadow-primary/20" onclick="saveScore()">SAVE SCORE</button>
+            <button class="w-full border border-outline-variant/30 py-3 font-headline font-bold uppercase text-on-surface-variant" onclick="resetCalculator()">RESET</button>
+        </div>
+        <div class="text-center font-bold h-6 text-sm" id="statusMessage"></div>
+    </div>
+
+    <section class="hidden" id="historySection">
+        <div class="flex justify-between items-end mb-6">
+            <h2 class="font-headline font-bold text-[12px] uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">history</span> PAST STAGES
+            </h2>
+            <button class="text-[10px] font-bold text-primary/70 uppercase" onclick="clearHistory()">Clear All</button>
+        </div>
+        <div class="space-y-4" id="historyList"></div>
+        <button class="w-full mt-6 py-4 border border-secondary/50 text-secondary uppercase text-[10px] font-black" onclick="exportHistory()">📋 Copy to Clipboard</button>
+    </section>
+
+    <section class="hidden text-center py-20" id="statsView">
+        <span class="material-symbols-outlined text-6xl text-outline-variant">analytics</span>
+        <p class="mt-4 text-on-surface-variant uppercase text-[10px] font-black">Performance Stats Coming Soon</p>
+    </section>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 pb-safe bg-[#0e0e0e] border-t border-outline-variant/10 z-50">
+    <button class="flex flex-col items-center text-secondary flex-1 h-full justify-center" id="nav-calculator" onclick="setActiveNav('calculator')">
+        <span class="material-symbols-outlined">calculate</span>
+        <span class="text-[10px] font-black uppercase">Calc</span>
+    </button>
+    <button class="flex flex-col items-center text-on-surface-variant flex-1 h-full justify-center" id="nav-scores" onclick="setActiveNav('scores')">
+        <span class="material-symbols-outlined">history</span>
+        <span class="text-[10px] font-black uppercase">Scores</span>
+    </button>
+    <button class="flex flex-col items-center text-on-surface-variant flex-1 h-full justify-center" id="nav-stats" onclick="setActiveNav('stats')">
+        <span class="material-symbols-outlined">leaderboard</span>
+        <span class="text-[10px] font-black uppercase">Stats</span>
+    </button>
+</nav>
+
+<script>
+    // State & Cache
+    let historyData = JSON.parse(localStorage.getItem('armory_hf_history') || '[]');
+    
+    const ui = {
+        hf: document.getElementById('hitFactorDisplay'),
+        pts: document.getElementById('pointsDisplay'),
+        timeDisplay: document.getElementById('timeDisplay'),
+        timeInput: document.getElementById('time'),
+        stageName: document.getElementById('stageName'),
+        historyList: document.getElementById('historyList'),
+        status: document.getElementById('statusMessage'),
+        views: {
+            calculator: document.getElementById('calculatorView'),
+            scores: document.getElementById('historySection'),
+            stats: document.getElementById('statsView'),
+            headerInput: document.getElementById('stageNameContainer')
+        }
+    };
+
+    function changeVal(id, delta) {
+        const el = document.getElementById(id);
+        el.value = Math.max(0, (parseInt(el.value) || 0) + delta);
+        calculateHF();
+    }
+
+    function calculateHF() {
+        const val = (id) => parseInt(document.getElementById(id).value) || 0;
+        
+        // SRA Scoring Logic
+        const rawPts = (val('aHits') * 5) + (val('cHits') * 3) + (val('dHits') * 1) 
+                     - (val('mHits') * 10) - (val('nsHits') * 10);
+        
+        // Floor points at 0 (SRA/IPSC rule)
+        const pts = Math.max(0, rawPts);
+        
+        const time = parseFloat(ui.timeInput.value) || 0;
+        const hf = time > 0 ? Math.max(0, pts / time) : 0;
+
+        ui.pts.textContent = pts;
+        ui.timeDisplay.textContent = time.toFixed(2) + 's';
+        ui.hf.textContent = hf.toFixed(2); 
+
+        return { pts, time, hf };
+    }
+
+    function saveScore() {
+        const { pts, time, hf } = calculateHF();
+        if (time <= 0) return showStatus("Time must be > 0", true);
+
+        const entry = {
+            id: Date.now(),
+            name: ui.stageName.value.trim() || "Unnamed Stage",
+            hf: hf.toFixed(2), 
+            points: pts,
+            time: time.toFixed(2),
+            date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            fullDate: new Date().toLocaleDateString()
+        };
+
+        historyData.unshift(entry);
+        localStorage.setItem('armory_hf_history', JSON.stringify(historyData.slice(0, 20)));
+        showStatus("Score Saved!");
+    }
+
+    function renderHistory() {
+        if (!historyData.length) {
+            ui.historyList.innerHTML = `<div class="py-20 text-center opacity-30 text-[10px] font-bold uppercase">Empty History</div>`;
+            return;
+        }
+        ui.historyList.innerHTML = historyData.map(item => `
+            <div class="bg-surface-container-high p-4 flex justify-between border-l-2 border-secondary shadow-md">
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-on-surface-variant font-bold uppercase">${item.name} • ${item.fullDate}</span>
+                    <span class="text-sm font-semibold">${item.points} PTS / ${item.time}s</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] text-secondary font-black block">HF</span>
+                    <span class="text-xl font-black tabular-nums">${item.hf}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function setActiveNav(id) {
+        // Toggle view visibility
+        ui.views.calculator.classList.toggle('hidden', id !== 'calculator');
+        ui.views.scores.classList.toggle('hidden', id !== 'scores');
+        ui.views.stats.classList.toggle('hidden', id !== 'stats');
+        ui.views.headerInput.classList.toggle('hidden', id !== 'calculator');
+
+        // Nav UI updates
+        ['calculator', 'scores', 'stats'].forEach(navId => {
+            const btn = document.getElementById(`nav-${navId}`);
+            const active = navId === id;
+            btn.classList.toggle('text-secondary', active);
+            btn.classList.toggle('text-on-surface-variant', !active);
+        });
+
+        if (id === 'scores') renderHistory();
+        window.scrollTo(0, 0);
+    }
+
+    function showStatus(msg, isErr) {
+        ui.status.textContent = msg;
+        ui.status.className = `text-center font-bold h-6 text-sm ${isErr ? 'text-primary' : 'text-secondary'}`;
+        setTimeout(() => ui.status.textContent = '', 2000);
+    }
+
+    function resetCalculator() {
+        ['aHits', 'cHits', 'dHits', 'mHits', 'nsHits'].forEach(id => document.getElementById(id).value = 0);
+        ui.timeInput.value = "0.00";
+        ui.stageName.value = "";
+        calculateHF();
+    }
+
+    function clearHistory() {
+        if (confirm('Clear all scores?')) {
+            historyData = [];
+            localStorage.removeItem('armory_hf_history');
+            renderHistory();
+        }
+    }
+
+    function exportHistory() {
+        if (!historyData.length) return showStatus("No data!", true);
+        const txt = "SRA Results:\n" + historyData.map(i => `*${i.name}*: HF ${i.hf} (${i.points} pts / ${i.time}s)`).join('\n');
+        navigator.clipboard.writeText(txt).then(() => showStatus("Copied!"));
+    }
+
+    window.onload = calculateHF;
+</script>
+
+</body>
+</html>
