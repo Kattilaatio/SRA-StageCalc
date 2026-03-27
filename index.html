@@ -2,7 +2,7 @@
 <html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
     <title>SRA STAGE CALC</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
@@ -33,6 +33,9 @@
         }
     </script>
     <style>
+        /* touch-action: manipulation completely disables double-tap to zoom on iOS */
+        button, input, a { touch-action: manipulation; }
+        
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .tabular-nums { font-variant-numeric: tabular-nums; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -53,8 +56,8 @@
     </div>
 </header>
 
-<main class="px-4 py-1 max-w-2xl mx-auto space-y-6">
-    <div class="space-y-3" id="calculatorView">
+<main class="px-4 py-2 max-w-2xl mx-auto space-y-2">
+    <div class="space-y-2" id="calculatorView">
 
         <section class="grid grid-cols-2 gap-2" id="scoringGrid">
             
@@ -64,52 +67,59 @@
                     <span class="material-symbols-outlined text-[12px] text-on-surface-variant">timer</span>
                 </div>
                 <div class="flex items-center h-10 w-full">
-                    <input class="w-full bg-transparent text-center font-headline font-bold text-3xl border-none p-0 focus:ring-0 tabular-nums text-on-surface" id="time" oninput="calculateHF()" step="0.01" type="number" value="0.00"/>
+                    <input class="w-full bg-transparent text-center font-headline font-bold text-3xl border-none p-0 focus:ring-0 tabular-nums text-on-surface" 
+                           id="time" 
+                           type="tel" 
+                           inputmode="numeric" 
+                           value="0.00"
+                           onfocus="this.value=''" 
+                           onblur="if(!this.value) { this.value='0.00'; calculateHF(); }"
+                           oninput="formatTime(this)" />
                 </div>
             </div>
 
             <div class="bg-surface-container p-2 flex flex-col items-center">
                 <span class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">A-Hits (5)</span>
-                <div class="flex items-center gap-1">
-                    <button class="w-12 h-12 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('aHits', -1)">-</button>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('aHits', -1)">-</button>
                     <input class="w-12 bg-transparent text-center font-headline font-bold text-2xl border-none focus:ring-0" id="aHits" oninput="calculateHF()" type="number" value="0"/>
-                    <button class="w-12 h-12 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('aHits', 1)">+</button>
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('aHits', 1)">+</button>
                 </div>
             </div>
 
             <div class="bg-surface-container p-2 flex flex-col items-center">
                 <span class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">C-Hits (3)</span>
-                <div class="flex items-center gap-1">
-                    <button class="w-12 h-12 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('cHits', -1)">-</button>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('cHits', -1)">-</button>
                     <input class="w-12 bg-transparent text-center font-headline font-bold text-2xl border-none focus:ring-0" id="cHits" oninput="calculateHF()" type="number" value="0"/>
-                    <button class="w-12 h-12 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('cHits', 1)">+</button>
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('cHits', 1)">+</button>
                 </div>
             </div>
 
             <div class="bg-surface-container p-2 flex flex-col items-center">
                 <span class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">D-Hits (1)</span>
-                <div class="flex items-center gap-1">
-                    <button class="w-12 h-12 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('dHits', -1)">-</button>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('dHits', -1)">-</button>
                     <input class="w-12 bg-transparent text-center font-headline font-bold text-2xl border-none focus:ring-0" id="dHits" oninput="calculateHF()" type="number" value="0"/>
-                    <button class="w-12 h-12 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('dHits', 1)">+</button>
+                    <button class="w-10 h-10 bg-surface-container-highest text-secondary active:scale-90 transition-transform" onclick="changeVal('dHits', 1)">+</button>
                 </div>
             </div>
 
             <div class="bg-surface-container p-2 flex flex-col items-center">
                 <span class="text-[10px] font-black uppercase tracking-widest text-primary mb-2">Misses (-10)</span>
-                <div class="flex items-center gap-1">
-                    <button class="w-12 h-12 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('mHits', -1)">-</button>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('mHits', -1)">-</button>
                     <input class="w-12 bg-transparent text-center font-headline font-bold text-2xl border-none focus:ring-0" id="mHits" oninput="calculateHF()" type="number" value="0"/>
-                    <button class="w-12 h-12 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('mHits', 1)">+</button>
+                    <button class="w-10 h-10 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('mHits', 1)">+</button>
                 </div>
             </div>
 
             <div class="bg-surface-container p-2 flex flex-col items-center">
                 <span class="text-[10px] font-black uppercase tracking-widest text-primary mb-2">No-Shoots (-10)</span>
-                <div class="flex items-center gap-1">
-                    <button class="w-12 h-12 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('nsHits', -1)">-</button>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('nsHits', -1)">-</button>
                     <input class="w-12 bg-transparent text-center font-headline font-bold text-2xl border-none focus:ring-0" id="nsHits" oninput="calculateHF()" type="number" value="0"/>
-                    <button class="w-12 h-12 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('nsHits', 1)">+</button>
+                    <button class="w-10 h-10 bg-surface-container-highest text-primary active:scale-90 transition-transform" onclick="changeVal('nsHits', 1)">+</button>
                 </div>
             </div>
         </section>
@@ -122,11 +132,11 @@
                 <p class="font-headline font-bold text-on-surface-variant text-[10px] uppercase tracking-[0.2em] mb-2">Hit Factor</p>
                 <div class="font-headline font-black text-secondary text-7xl md:text-8xl leading-none tabular-nums" id="hitFactorDisplay">0.00</div>
                 <div class="mt-6 flex gap-4 w-full">
-                    <div class="flex-1 bg-surface-container p-1 flex flex-col items-center border border-outline-variant/20">
+                    <div class="flex-1 bg-surface-container p-2 flex flex-col items-center border border-outline-variant/20">
                         <span class="text-[10px] text-on-surface-variant uppercase font-bold">Points</span>
                         <span class="text-2xl font-headline font-bold" id="pointsDisplay">0</span>
                     </div>
-                    <div class="flex-1 bg-surface-container p-1 flex flex-col items-center border border-outline-variant/20">
+                    <div class="flex-1 bg-surface-container p-2 flex flex-col items-center border border-outline-variant/20">
                         <span class="text-[10px] text-on-surface-variant uppercase font-bold">Time</span>
                         <span class="text-2xl font-headline font-bold" id="timeDisplay">0.00s</span>
                     </div>
@@ -134,8 +144,8 @@
             </div>
         </section>
 
-        <div class="space-y-3 pt-1">
-            <button class="w-full primary-gradient py-4 font-headline font-black text-black uppercase tracking-[0.2em] active:scale-[0.98] transition-transform shadow-lg shadow-primary/20" onclick="saveScore()">SAVE SCORE</button>
+        <div class="space-y-3 pt-4">
+            <button class="w-full primary-gradient py-5 font-headline font-black text-black uppercase tracking-[0.2em] active:scale-[0.98] transition-transform shadow-lg shadow-primary/20" onclick="saveScore()">SAVE SCORE</button>
             <button class="w-full border border-outline-variant/30 py-3 font-headline font-bold uppercase text-on-surface-variant" onclick="resetCalculator()">RESET</button>
         </div>
         <div class="text-center font-bold h-6 text-sm" id="statusMessage"></div>
@@ -193,6 +203,24 @@
         }
     };
 
+    // Auto-formats the time input to act like a cash register
+    function formatTime(el) {
+        // Strip everything except raw digits
+        let rawDigits = el.value.replace(/\D/g, '');
+        
+        if (!rawDigits) {
+            el.value = '';
+            calculateHF();
+            return;
+        }
+
+        // Convert to integer and divide by 100 to shift the decimal
+        let formattedValue = (parseInt(rawDigits, 10) / 100).toFixed(2);
+        el.value = formattedValue;
+        
+        calculateHF();
+    }
+
     function changeVal(id, delta) {
         const el = document.getElementById(id);
         el.value = Math.max(0, (parseInt(el.value) || 0) + delta);
@@ -206,7 +234,7 @@
         const rawPts = (val('aHits') * 5) + (val('cHits') * 3) + (val('dHits') * 1) 
                      - (val('mHits') * 10) - (val('nsHits') * 10);
         
-        // Floor points at 0 (SRA/IPSC rule)
+        // Floor points at 0
         const pts = Math.max(0, rawPts);
         
         const time = parseFloat(ui.timeInput.value) || 0;
